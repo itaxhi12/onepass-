@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
 const express = require('express')
 const secret ="afhakjfgakfg&*%^$%^afasdk"
-
+const {encrypt,decrypt} = require("./hash")
 
 const router = express.Router()
 
@@ -21,7 +21,7 @@ notesSchema = mongoose.Schema({
 
 const notes = mongoose.model('Note Schema', notesSchema)
 router.post('/notes',async(req,res)=>{
-    const{topic,note}= req.body
+    let { topic, note } = req.body
     try{
         const response = await notes.create({topic,note})
         res.json({status:"okay"})   
@@ -45,11 +45,11 @@ router.post('/notes',async(req,res)=>{
 
 router.get('/notes',async(req,res)=>{
     
-    const token = req.header("Auth")
+    const token = req.header("Authorization")
     if(token){
         const verification = jwt.verify(token,secret)
         if(verification){
-            const Notes = await notes.find({})
+            let Notes = await notes.find({})
             res.status(200).json(Notes)
         }else{
             res.status(200).json({message:"User Unauthorized"})
